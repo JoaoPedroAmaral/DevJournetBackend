@@ -22,7 +22,14 @@ public class Posts {
     @Setter
     @Getter
     private String content;
-    private String image_url; // URL da imagem (armazenada no AWS S3 ou similar)
+
+    @Setter
+    @Getter
+    @Lob
+    @Column(name="image_url", columnDefinition="LONGBLOB")
+    private byte[] image_url;
+
+
     private LocalDateTime created_at;
 
     @Setter
@@ -34,14 +41,6 @@ public class Posts {
     @Getter
     @ManyToOne
     private Users author;
-
-    public String getImageUrl() {
-        return image_url;
-    }
-
-    public void setImageUrl(String image_url) {
-        this.image_url = image_url;
-    }
 
     public LocalDateTime getCreatedAt() {
         return created_at;

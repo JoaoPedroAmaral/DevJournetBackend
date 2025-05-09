@@ -30,7 +30,7 @@ public class PostService {
         return postRepository.findById(id).map(post -> {
             post.setTitle(updatedPost.getTitle());
             post.setContent(updatedPost.getContent());
-            post.setImageUrl(updatedPost.getImageUrl());
+            post.setImage_url(updatedPost.getImage_url());
             post.setTags(updatedPost.getTags());
             return postRepository.save(post);
         }).orElse(null);

@@ -28,7 +28,7 @@ public class UserController {
     public ResponseEntity<?> getUserByUsername(@PathVariable String username) {
         return userService.findByUsername(username)
                 .map(ResponseEntity::ok) // Retorna o usuário se encontrado
-                .orElseGet(() -> ResponseEntity.notFound().build()); // Retorna 404 se não encontrado
+                .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @GetMapping("/check-username/{username}")
