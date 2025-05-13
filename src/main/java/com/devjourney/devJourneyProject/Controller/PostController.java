@@ -1,12 +1,17 @@
 package com.devjourney.devJourneyProject.Controller;
 
 import com.devjourney.devJourneyProject.Model.Posts;
+import com.devjourney.devJourneyProject.Model.Users;
+import com.devjourney.devJourneyProject.Repository.UserRepository;
 import com.devjourney.devJourneyProject.Service.PostService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -14,6 +19,9 @@ import java.util.List;
 public class PostController {
     @Autowired
     private PostService postService;
+
+    @Autowired
+    private UserRepository userRepository;
 
     @GetMapping
     public List<Posts> getAllPosts() {
@@ -35,9 +43,14 @@ public class PostController {
             @RequestParam("title") String title,
             @RequestParam("content") String content,
             @RequestParam(value = "tags", required = false) String tags,
-            @RequestParam("image") MultipartFile imageFile
+            @RequestParam("image") MultipartFile imageFile,
+            @RequestParam("authorId") Long authorId,
+            @RequestParam("link") String link
     ){
         try{
+            Users author = userRepository.findById(authorId)
+                    .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
+
             Posts post = new Posts();
             post.setTitle(title);
             post.setContent(content);
@@ -46,6 +59,9 @@ public class PostController {
                 post.setTags(tagList);
             }
             post.setImage_url(imageFile.getBytes());
+            post.setAuthor(author);
+            post.setCreatedAt(LocalDateTime.now());
+            post.setLink(link);
 
             Posts saved = postService.createPost(post);
             return ResponseEntity.ok(saved);
@@ -67,9 +83,42 @@ public class PostController {
     }
 
 
-    @PutMapping("/{id}")
-    public Posts updatePost(@PathVariable Long id, @RequestBody Posts post) {
-        return postService.updatePost(id, post);
+    @PutMapping(value = "/{id}/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<Posts> updatePostWithImage(
+            @PathVariable Long id,
+            @RequestParam("title") String title,
+            @RequestParam("content") String content,
+            @RequestParam(value = "tags", required = false) String tags,
+            @RequestParam("image") MultipartFile imageFile,
+            @RequestParam("authorId") Long authorId,
+            @RequestParam("link") String link
+    ) {
+        try {
+            Users author = userRepository.findById(authorId)
+                    .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
+
+
+            Posts post = postService.getPostById(id);
+            if (post == null) {
+                return ResponseEntity.notFound().build();
+            }
+
+            post.setTitle(title);
+            post.setContent(content);
+            if (tags != null && !tags.isEmpty()) {
+                List<String> tagList = new ArrayList<>(List.of(tags.split(",\\s*")));
+                post.setTags(tagList);
+            }
+            post.setImage_url(imageFile.getBytes());
+            post.setAuthor(author);
+            post.setLink(link);
+
+            Posts updated = postService.updatePost(id, post);
+            return ResponseEntity.ok(updated);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.badRequest().body(null);
+        }
     }
 
     @DeleteMapping("/{id}")

@@ -32,6 +32,7 @@ public class PostService {
             post.setContent(updatedPost.getContent());
             post.setImage_url(updatedPost.getImage_url());
             post.setTags(updatedPost.getTags());
+            post.setLink(updatedPost.getLink());
             return postRepository.save(post);
         }).orElse(null);
     }

@@ -42,6 +42,10 @@ public class Posts {
     @ManyToOne
     private Users author;
 
+    @Setter
+    @Getter
+    private String link;
+
     public LocalDateTime getCreatedAt() {
         return created_at;
     }
