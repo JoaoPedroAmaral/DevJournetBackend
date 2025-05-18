@@ -14,7 +14,7 @@ public class WebConfig {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
                 registry.addMapping("/api/**")
-                        .allowedOrigins("https://devjourneyfrontend.onrender.com/")
+                        .allowedOrigins("https://devjourneyfrontend.onrender.com/", "http://localhost:3000/")
                         .allowedMethods("GET", "POST", "PUT", "DELETE")
                         .allowedHeaders("*");
             }
